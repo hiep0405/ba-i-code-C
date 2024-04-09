@@ -42,13 +42,14 @@ int main() {
         printf("8. Luu vao file\n");
         printf("9. Doc danh sach tu file\n");
         printf("0. Thoat\n");
-        printf("Lua chon chuc nang tu menu: ");
+        printf("Lua chon 1 chuc nang tu menu: ");
         scanf("%d", &choice);
         printf("\n");
 //xử lý choice
         switch (choice) {
             case 1:
                 nhapDanhSachSinhVien(danhSachSinhVien, &soLuongSinhVien);
+                bubbleSort(danhSachSinhVien, soLuongSinhVien);
                 break;
             case 2:
                 timKiemSinhVienBangMaSV(danhSachSinhVien, soLuongSinhVien);
@@ -60,8 +61,28 @@ int main() {
                 xoaThongTinSinhVien(danhSachSinhVien, &soLuongSinhVien);
                 break;
             case 5:
-                // Tạm thời chưa cần gọi hàm này trong menu
+    {
+        char maSinhVien[10];
+        printf("Nhap ma sinh vien can tinh diem trung binh: ");
+        scanf("%s", maSinhVien);
+
+        bool timThay = false;
+        for (int i = 0; i < soLuongSinhVien; i++) {
+            if (strcmp(danhSachSinhVien[i].maSinhVien, maSinhVien) == 0) {
+                float diemTB = tinhDiemTrungBinhCua1SV(danhSachSinhVien[i].diemToan, danhSachSinhVien[i].diemVan, danhSachSinhVien[i].diemAnhVan);
+                printf("Diem trung binh cua sinh vien %s la: %.2f\n", maSinhVien, diemTB);
+                timThay = true;
                 break;
+            }
+        }
+
+        if (!timThay) {
+            printf("Khong tim thay sinh vien voi ma: %s\n", maSinhVien);
+        }
+        bubbleSort(danhSachSinhVien, soLuongSinhVien);
+        break;
+    }
+    
             case 6:
                 printf("Diem trung binh toan bo SV: %.2f\n", tinhDiemTrungBinhToanBoSV(danhSachSinhVien, soLuongSinhVien));
                 break;
@@ -70,9 +91,11 @@ int main() {
                 break;
             case 8:
                 luuDanhSachSinhVienVaoFile(danhSachSinhVien, soLuongSinhVien, "sinhvien.txt");
+                printf("luu vao file sinhvien.txt thanh cong.\n");
                 break;
             case 9:
                 docDanhSachSinhVienTuFile(danhSachSinhVien, &soLuongSinhVien, "sinhvien.txt");
+                hienThiToanBoDanhSachSV(danhSachSinhVien, soLuongSinhVien);
                 break;
             case 0:
                 thoat = true;
@@ -107,7 +130,7 @@ void nhapDanhSachSinhVien(struct SinhVien *danhSachSinhVien, int *soLuongSinhVie
 }
 
 void timKiemSinhVienBangMaSV(struct SinhVien *danhSachSinhVien, int soLuongSinhVien) {
-    char maTimKiem[10];
+    char maTimKiem[8];
     printf("Nhap ma sinh vien can tim: ");
     scanf("%s", maTimKiem);
 
@@ -189,10 +212,21 @@ void xoaThongTinSinhVien(struct SinhVien *danhSachSinhVien, int *soLuongSinhVien
         printf("Khong tim thay sinh vien voi ma: %s\n", maSinhVien);
     }
 }
-
 float tinhDiemTrungBinhCua1SV(float diemToan, float diemVan, float diemAnhVan) {
     return (diemToan + diemVan + diemAnhVan) / 3;
 }
+void bubbleSort(struct SinhVien *danhSachSinhVien, int soLuongSinhVien) {
+    for (int i = 0; i < soLuongSinhVien - 1; i++) {
+        for (int j = 0; j < soLuongSinhVien - i - 1; j++) {
+            if (tinhDiemTrungBinhCua1SV(danhSachSinhVien[j].diemToan, danhSachSinhVien[j].diemVan, danhSachSinhVien[j].diemAnhVan) > tinhDiemTrungBinhCua1SV(danhSachSinhVien[j + 1].diemToan, danhSachSinhVien[j + 1].diemVan, danhSachSinhVien[j + 1].diemAnhVan)) {
+                struct SinhVien temp = danhSachSinhVien[j];
+                danhSachSinhVien[j] = danhSachSinhVien[j + 1];
+                danhSachSinhVien[j + 1] = temp;
+            }
+        }
+    }
+}
+
 
 float tinhDiemTrungBinhToanBoSV(struct SinhVien *danhSachSinhVien, int soLuongSinhVien) {
     float tongDiem = 0.0;
@@ -246,4 +280,3 @@ void docDanhSachSinhVienTuFile(struct SinhVien *danhSachSinhVien, int *soLuongSi
 
     fclose(file);
 }
-
